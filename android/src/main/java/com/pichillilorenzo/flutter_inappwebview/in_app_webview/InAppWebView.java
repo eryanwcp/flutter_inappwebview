@@ -1,19 +1,25 @@
 package com.pichillilorenzo.flutter_inappwebview.in_app_webview;
 
+import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.Environment;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
@@ -41,16 +47,21 @@ import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
 import android.webkit.WebSettings;
 import android.webkit.WebStorage;
+import android.webkit.WebView;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.webkit.JavaScriptReplyProxy;
+import androidx.webkit.WebMessageCompat;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
+import com.pichillilorenzo.flutter_inappwebview.RequestPermissionHandler;
 import com.pichillilorenzo.flutter_inappwebview.JavaScriptBridgeInterface;
 import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.Shared;
@@ -60,6 +71,8 @@ import com.pichillilorenzo.flutter_inappwebview.content_blocker.ContentBlockerAc
 import com.pichillilorenzo.flutter_inappwebview.content_blocker.ContentBlockerHandler;
 import com.pichillilorenzo.flutter_inappwebview.content_blocker.ContentBlockerTrigger;
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserDelegate;
+import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
+import com.pichillilorenzo.flutter_inappwebview.types.UserScript;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.ConsoleLogJS;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.InterceptAjaxRequestJS;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.InterceptFetchRequestJS;
@@ -84,17 +97,24 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
 import io.flutter.plugin.common.MethodChannel;
 import okhttp3.OkHttpClient;
 
+import static android.content.Context.DOWNLOAD_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static com.pichillilorenzo.flutter_inappwebview.types.PreferredContentModeOptionType.fromValue;
 
@@ -135,6 +155,8 @@ final public class InAppWebView extends InputAwareWebView {
 
   public Runnable checkContextMenuShouldBeClosedTask;
   public int newCheckContextMenuShouldBeClosedTaskTask = 100; // ms
+
+  private DownloadStartListener downloadStartListener;
 
   public UserContentController userContentController = new UserContentController();
 
@@ -211,8 +233,11 @@ final public class InAppWebView extends InputAwareWebView {
       userContentController.addPluginScript(PluginScriptsUtil.CHECK_GLOBAL_KEY_DOWN_EVENT_TO_HIDE_CONTEXT_MENU_JS_PLUGIN_SCRIPT);
     }
 
-    if (options.useOnDownloadStart)
-      setDownloadListener(new DownloadStartListener());
+    final Activity activity = Shared.activity;
+    if (options.useOnDownloadStart){
+      this.downloadStartListener = new DownloadStartListener(activity,options.useOnDownloadStart);
+      setDownloadListener(downloadStartListener);
+    }
 
     WebSettings settings = getSettings();
 
@@ -750,7 +775,7 @@ final public class InAppWebView extends InputAwareWebView {
 
     if (newOptionsMap.get("useOnDownloadStart") != null && options.useOnDownloadStart != newOptions.useOnDownloadStart) {
       if (newOptions.useOnDownloadStart) {
-        setDownloadListener(new DownloadStartListener());
+        setDownloadListener(downloadStartListener);
       } else {
         setDownloadListener(null);
       }
@@ -1180,11 +1205,58 @@ final public class InAppWebView extends InputAwareWebView {
   }
 
   class DownloadStartListener implements DownloadListener {
+
+    Activity activity;
+    Boolean useOnDownloadStart;
+
+    public DownloadStartListener(Activity activity, Boolean useOnDownloadStart) {
+      this.activity = activity;
+      this.useOnDownloadStart = useOnDownloadStart;
+    }
+
     @Override
-    public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
-      Map<String, Object> obj = new HashMap<>();
-      obj.put("url", url);
-      channel.invokeMethod("onDownloadStart", obj);
+    public void onDownloadStart(final String url, final String userAgent, final String contentDisposition, final String mimetype, long contentLength) {
+      if (useOnDownloadStart){
+        Map<String, Object> obj = new HashMap<>();
+        obj.put("url", url);
+        channel.invokeMethod("onDownloadStart", obj);
+      }
+
+      RequestPermissionHandler.checkAndRun(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE, RequestPermissionHandler.REQUEST_CODE_WRITE_EXTERNAL_STORAGE, new Runnable() {
+        @Override
+        public void run() {
+          DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+
+          final String filename = android.webkit.URLUtil.guessFileName(url, contentDisposition, mimetype);
+          request.allowScanningByMediaScanner();
+          CookieManager cookieManager = CookieManager.getInstance();
+          String cookie = cookieManager.getCookie(url);
+          request.addRequestHeader("Cookie", cookie);
+          request.setMimeType(mimetype);
+          request.addRequestHeader("User-Agent", userAgent);
+          request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED); //Notify client once download is completed!
+          request.setVisibleInDownloadsUi(true);
+          request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
+          DownloadManager dm = (DownloadManager) activity.getSystemService(DOWNLOAD_SERVICE);
+          String mFileName = filename;
+          try {
+            mFileName = URLDecoder.decode(filename,"UTF-8");
+          } catch (UnsupportedEncodingException e) {
+            Log.e(LOG_TAG,e.getMessage());
+          }
+
+          if (dm != null) {
+            dm.enqueue(request);
+            Toast.makeText(activity, "文件已下载: " + mFileName, //To notify the Client that the file is being downloaded
+                    Toast.LENGTH_LONG).show();
+          } else {
+            Toast.makeText(activity, "无法下载文件: " + mFileName, //To notify the Client that the file cannot be downloaded
+                    Toast.LENGTH_LONG).show();
+          }
+        }
+      });
+
+
     }
   }
 

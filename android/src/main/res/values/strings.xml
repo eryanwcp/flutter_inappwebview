@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="action_go_back">Go Back</string>
-    <string name="action_go_forward">Go Forward</string>
-    <string name="action_reload">Reload</string>
-    <string name="action_share">Share</string>
-    <string name="action_close">Close</string>
-    <string name="menu_search">Search</string>
+    <string name="action_go_back">回退</string>
+    <string name="action_go_forward">前进</string>
+    <string name="action_reload">刷新</string>
+    <string name="action_share">分享</string>
+    <string name="action_close">关闭</string>
+    <string name="menu_search">搜索</string>
 </resources>
