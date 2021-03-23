@@ -3,6 +3,7 @@
 - Added `WebMessageChannel` and `WebMessageListener` features
 - Added `canScrollVertically` and `canScrollHorizontally` webview methods
 - Added Android pull-to-refresh `setSize` method and `size` option
+- Added `onOverScrolled` WebView event
 - `AndroidInAppWebViewController.getCurrentWebViewPackage` is available now starting from Android API 21+
 - Updated Android Gradle distributionUrl version to `5.6.4`
 - Updated Android `androidx.webkit:webkit` to `1.4.0`, `androidx.browser:browser` to `1.3.0`, `androidx.appcompat:appcompat` to `1.2.0`
@@ -13,6 +14,7 @@
 - Fixed iOS sometimes `scrollView.contentSize` doesn't fit all the `frame.size` available
 - Fixed ajax and fetch interceptor when the data/body sent is not a string
 - Fixed "InAppLocalhostServer - Error: type 'List<dynamic>' is not a subtype of type 'List<int>' in type cast" [#724](https://github.com/pichillilorenzo/flutter_inappwebview/issues/724)
+- Merge "fix proguard" [#737](https://github.com/pichillilorenzo/flutter_inappwebview/pull/737) (thanks to [myroid](https://github.com/myroid))
 
 ### BREAKING CHANGES
 
