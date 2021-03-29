@@ -237,7 +237,7 @@ final public class InAppWebView extends InputAwareWebView {
       userContentController.addPluginScript(PluginScriptsUtil.CHECK_GLOBAL_KEY_DOWN_EVENT_TO_HIDE_CONTEXT_MENU_JS_PLUGIN_SCRIPT);
     }
 
-    final Activity activity = Shared.activity;
+    final Activity activity = plugin.activity;
     if (options.useOnDownloadStart){
       this.downloadStartListener = new DownloadStartListener(activity,options.useOnDownloadStart);
       setDownloadListener(downloadStartListener);
