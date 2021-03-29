@@ -1,3 +1,16 @@
+## 5.3.0
+
+- Added `initialSize` property to the `HeadlessInAppWebView` class
+- Added `setSize` and `getSize` methods to the `HeadlessInAppWebView` class
+- `androidOnScaleChanged` WebView event is now deprecated. Use the new `onZoomScaleChanged` WebView event, that is available for both Android and iOS
+- `getScale` WebView method is now deprecated. Use the new `getZoomScale` WebView method
+- Removed `final` keyword for all `HeadlessInAppWebView` events
+- Fixed wrong usage of Android WebView scale property
+- Fixed "java.lang.NullPointerException: com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebViewRenderProcessClient$1.success(InAppWebViewRenderProcessClient.java:37)" [#757](https://github.com/pichillilorenzo/flutter_inappwebview/issues/757)
+- Fixed "In a multi-activity app, the plugin doesn't reattach to the first activity" [#732](https://github.com/pichillilorenzo/flutter_inappwebview/issues/732)
+- Fixed "ChromeSafariBrowser isn't calling its events, and not keeping track of isOpen properly" [#759](https://github.com/pichillilorenzo/flutter_inappwebview/issues/759)
+- Fixed Android ChromeSafariBrowser menu item callback not called because of PendingIntents extra were cached
+
 ## 5.2.1+1
 
 - Fixed iOS "Unexpectedly found nil while unwrapping an Optional value: file flutter_inappwebview/WKUserContentController.swift, line 36" error when `applePayAPIEnabled` iOS-specific WebView option is enabled
