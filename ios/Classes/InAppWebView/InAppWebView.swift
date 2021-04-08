@@ -39,6 +39,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     var recognizerForDisablingContextMenuOnLinks: UILongPressGestureRecognizer!
     var lastLongPressTouchPoint: CGPoint?
     
+    var panGestureRecognizer: UIPanGestureRecognizer!
+    
     var lastTouchPoint: CGPoint?
     var lastTouchPointTimestamp = Int64(Date().timeIntervalSince1970 * 1000)
     
@@ -70,6 +72,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         recognizerForDisablingContextMenuOnLinks.delegate = self
         recognizerForDisablingContextMenuOnLinks.addTarget(self, action: #selector(longPressGestureDetected))
         recognizerForDisablingContextMenuOnLinks?.minimumPressDuration = 0.45
+        panGestureRecognizer = UIPanGestureRecognizer()
+        panGestureRecognizer.delegate = self
+        panGestureRecognizer.addTarget(self, action: #selector(endDraggingDetected))
     }
     
     override public var frame: CGRect {
@@ -260,17 +265,23 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         return super.canPerformAction(action, withSender: sender)
     }
     
-    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        // fix for pull-to-refresh jittering when the touch drag event is held
-        if let pullToRefreshControl = pullToRefreshControl,
-           pullToRefreshControl.shouldCallOnRefresh {
-            pullToRefreshControl.onRefresh()
+    // For some reasons, using the scrollViewDidEndDragging event, in some rare cases, could block
+    // the scroll gesture
+    @objc func endDraggingDetected() {
+        // detect end dragging
+        if panGestureRecognizer.state == .ended {
+            // fix for pull-to-refresh jittering when the touch drag event is held
+            if let pullToRefreshControl = pullToRefreshControl,
+               pullToRefreshControl.shouldCallOnRefresh {
+                pullToRefreshControl.onRefresh()
+            }
         }
     }
 
     public func prepare() {
         scrollView.addGestureRecognizer(self.longPressRecognizer)
         scrollView.addGestureRecognizer(self.recognizerForDisablingContextMenuOnLinks)
+        scrollView.addGestureRecognizer(self.panGestureRecognizer)
         scrollView.addObserver(self, forKeyPath: #keyPath(UIScrollView.contentOffset), options: [.new, .old], context: nil)
         scrollView.addObserver(self, forKeyPath: #keyPath(UIScrollView.zoomScale), options: [.new, .old], context: nil)
         
@@ -769,12 +780,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         load(request)
     }
     
-    public func loadData(data: String, mimeType: String, encoding: String, baseUrl: String) {
-        let url = URL(string: baseUrl)!
+    public func loadData(data: String, mimeType: String, encoding: String, baseUrl: URL, allowingReadAccessTo: URL?) {
+        if #available(iOS 9.0, *), let allowingReadAccessTo = allowingReadAccessTo, baseUrl.scheme == "file", allowingReadAccessTo.scheme == "file" {
+            loadFileURL(baseUrl, allowingReadAccessTo: allowingReadAccessTo)
+        }
+        
         if #available(iOS 9.0, *) {
-            load(data.data(using: .utf8)!, mimeType: mimeType, characterEncodingName: encoding, baseURL: url)
+            load(data.data(using: .utf8)!, mimeType: mimeType, characterEncodingName: encoding, baseURL: baseUrl)
         } else {
-            loadHTMLString(data, baseURL: url)
+            loadHTMLString(data, baseURL: baseUrl)
         }
     }
     
@@ -1322,7 +1336,22 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 scriptAttributes += " script.type = '\(typeAttr.replacingOccurrences(of: "\'", with: "\\'"))'; "
             }
             if let idAttr = scriptHtmlTagAttributes["id"] as? String {
-                scriptAttributes += " script.id = '\(idAttr.replacingOccurrences(of: "\'", with: "\\'"))'; "
+                let scriptIdEscaped = idAttr.replacingOccurrences(of: "\'", with: "\\'")
+                scriptAttributes += " script.id = '\(scriptIdEscaped)'; "
+                scriptAttributes += """
+                script.onload = function() {
+                    if (window.\(JAVASCRIPT_BRIDGE_NAME) != null) {
+                        window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('onInjectedScriptLoaded', '\(scriptIdEscaped)');
+                    }
+                };
+                """
+                scriptAttributes += """
+                script.onerror = function() {
+                    if (window.\(JAVASCRIPT_BRIDGE_NAME) != null) {
+                        window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('onInjectedScriptError', '\(scriptIdEscaped)');
+                    }
+                };
+                """
             }
             if let asyncAttr = scriptHtmlTagAttributes["async"] as? Bool, asyncAttr {
                 scriptAttributes += " script.async = true; "
@@ -2892,6 +2921,9 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         recognizerForDisablingContextMenuOnLinks.removeTarget(self, action: #selector(longPressGestureDetected))
         recognizerForDisablingContextMenuOnLinks.delegate = nil
         scrollView.removeGestureRecognizer(recognizerForDisablingContextMenuOnLinks)
+        panGestureRecognizer.removeTarget(self, action: #selector(endDraggingDetected))
+        panGestureRecognizer.delegate = nil
+        scrollView.removeGestureRecognizer(panGestureRecognizer)
         disablePullToRefresh()
         pullToRefreshControl?.dispose()
         pullToRefreshControl = nil
