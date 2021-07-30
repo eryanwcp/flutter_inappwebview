@@ -28,6 +28,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.ContextMenu;
+import android.view.DragEvent;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -501,22 +502,6 @@ final public class InAppWebView extends InputAwareWebView {
         obj.put("extra", hitTestResult.getExtra());
         channel.invokeMethod("onLongPressHitTestResult", obj);
         return false;
-      }
-    });
-
-    getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-      @Override
-      public void onGlobalLayout() {
-        final boolean canScrollVertical = canScrollVertically();
-        ViewParent parent = getParent();
-        if (parent instanceof PullToRefreshLayout) {
-          PullToRefreshLayout pullToRefreshLayout = (PullToRefreshLayout) parent;
-          if (!canScrollVertical) {
-            pullToRefreshLayout.setEnabled(false);
-          } else {
-            pullToRefreshLayout.setEnabled(pullToRefreshLayout.options.enabled);
-          }
-        }
       }
     });
   }
@@ -1059,7 +1044,18 @@ final public class InAppWebView extends InputAwareWebView {
       }
       String idAttr = (String) scriptHtmlTagAttributes.get("id");
       if (idAttr != null) {
-        scriptAttributes += " script.id = '" + idAttr.replaceAll("'", "\\\\'") + "'; ";
+        String scriptIdEscaped = idAttr.replaceAll("'", "\\\\'");
+        scriptAttributes += " script.id = '" + scriptIdEscaped + "'; ";
+        scriptAttributes += " script.onload = function() {" +
+        "  if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + " != null) {" +
+        "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + ".callHandler('onInjectedScriptLoaded', '" + scriptIdEscaped + "');" +
+        "  }" +
+        "};";
+        scriptAttributes += " script.onerror = function() {" +
+        "  if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + " != null) {" +
+        "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + ".callHandler('onInjectedScriptError', '" + scriptIdEscaped + "');" +
+        "  }" +
+        "};";
       }
       Boolean asyncAttr = (Boolean) scriptHtmlTagAttributes.get("async");
       if (asyncAttr != null && asyncAttr) {
@@ -1320,6 +1316,15 @@ final public class InAppWebView extends InputAwareWebView {
   @Override
   public boolean onTouchEvent(MotionEvent ev) {
     lastTouch = new Point((int) ev.getX(), (int) ev.getY());
+
+    ViewParent parent = getParent();
+    if (parent instanceof PullToRefreshLayout) {
+      PullToRefreshLayout pullToRefreshLayout = (PullToRefreshLayout) parent;
+      if (ev.getActionMasked() == MotionEvent.ACTION_DOWN) {
+        pullToRefreshLayout.setEnabled(false);
+      }
+    }
+
     return super.onTouchEvent(ev);
   }
 
@@ -1329,6 +1334,17 @@ final public class InAppWebView extends InputAwareWebView {
 
     boolean overScrolledHorizontally = canScrollHorizontally() && clampedX;
     boolean overScrolledVertically = canScrollVertically() && clampedY;
+
+    ViewParent parent = getParent();
+    if (parent instanceof PullToRefreshLayout && overScrolledVertically && scrollY <= 10) {
+      PullToRefreshLayout pullToRefreshLayout = (PullToRefreshLayout) parent;
+      // change over scroll mode to OVER_SCROLL_NEVER in order to disable temporarily the glow effect
+      setOverScrollMode(OVER_SCROLL_NEVER);
+      pullToRefreshLayout.setEnabled(pullToRefreshLayout.options.enabled);
+      // reset over scroll mode
+      setOverScrollMode(options.overScrollMode);
+    }
+
     if (overScrolledHorizontally || overScrolledVertically) {
       Map<String, Object> obj = new HashMap<>();
       obj.put("x", scrollX);
