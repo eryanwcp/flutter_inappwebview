@@ -582,7 +582,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
         url = imageUrl;
       }
     }
-t
+
     URLRequest request = new URLRequest(url, "GET", null, null);
     CreateWindowAction createWindowAction = new CreateWindowAction(
             request,
