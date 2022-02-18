@@ -139,7 +139,9 @@ class HeadlessInAppWebView implements WebView {
     args.putIfAbsent(
         'params',
         () => <String, dynamic>{
-              'initialUrlRequest': this.initialUrlRequest?.toMap(),
+              'initialUrlRequest': (this.initialUrlRequest ??
+                      URLRequest(url: Uri.parse("about:blank")))
+                  .toMap(),
               'initialFile': this.initialFile,
               'initialData': this.initialData?.toMap(),
               'initialOptions': this.initialOptions?.toMap() ?? {},
