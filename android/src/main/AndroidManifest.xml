@@ -4,10 +4,12 @@
           package="com.pichillilorenzo.flutter_inappwebview">
     <application>
         <activity
+            android:exported="true"
             android:theme="@style/AppTheme"
             android:name="com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density" />
         <activity
+            android:exported="true"
             android:theme="@style/ThemeTransparent"
             android:name="com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs.ChromeCustomTabsActivity" />
         <receiver android:name="com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs.ActionBroadcastReceiver" />
@@ -20,7 +22,7 @@
         <provider
             android:name="com.pichillilorenzo.flutter_inappwebview.InAppWebViewFileProvider"
             android:authorities="${applicationId}.fileprovider"
-            android:exported="false"
+            android:exported="true"
             android:grantUriPermissions="true"
             tools:replace="android:authorities">
             <meta-data
@@ -35,8 +37,7 @@
 
     <queries>
         <intent>
-            <action android:name=
-                        "android.support.customtabs.action.CustomTabsService" />
+            <action android:name="android.support.customtabs.action.CustomTabsService" />
         </intent>
     </queries>
 </manifest>
