@@ -213,12 +213,7 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
     String cookieValue = name + "=; Path=" + path + "; Domain=" + domain + "; Max-Age=-1;";
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      cookieManager.setCookie(url, cookieValue, new ValueCallback<Boolean>() {
-        @Override
-        public void onReceiveValue(Boolean aBoolean) {
-          result.success(true);
-        }
-      });
+      cookieManager.setCookie(url, cookieValue, aBoolean -> result.success(true));
       cookieManager.flush();
     }
     else {
@@ -270,12 +265,7 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
     if (cookieManager == null) return;
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      cookieManager.removeAllCookies(new ValueCallback<Boolean>() {
-        @Override
-        public void onReceiveValue(Boolean aBoolean) {
-          result.success(true);
-        }
-      });
+      cookieManager.removeAllCookies(aBoolean -> result.success(true));
       cookieManager.flush();
     }
     else {
