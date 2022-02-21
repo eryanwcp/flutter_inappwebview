@@ -160,12 +160,7 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
     cookieValue += ";";
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      cookieManager.setCookie(url, cookieValue, new ValueCallback<Boolean>() {
-        @Override
-        public void onReceiveValue(Boolean aBoolean) {
-          result.success(true);
-        }
-      });
+      cookieManager.setCookie(url, cookieValue, aBoolean -> result.success(true));
       cookieManager.flush();
     }
     else {
