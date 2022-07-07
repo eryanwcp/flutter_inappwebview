@@ -767,7 +767,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
     if (newOptionsMap.get("useOnDownloadStart") != null && options.useOnDownloadStart != newOptions.useOnDownloadStart) {
       if (newOptions.useOnDownloadStart) {
-        setDownloadListener(new DownloadStartListener());
+        setDownloadListener(downloadStartListener);
       } else {
         setDownloadListener(null);
       }
