@@ -16,7 +16,7 @@ import AVFoundation
 public class HeadlessInAppWebViewManager: NSObject, FlutterPlugin {
     static var registrar: FlutterPluginRegistrar?
     static var channel: FlutterMethodChannel?
-    static var webViews: [String: HeadlessInAppWebView] = [:]
+    static var webViews: [String: HeadlessInAppWebView?] = [:]
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         
@@ -56,5 +56,16 @@ public class HeadlessInAppWebViewManager: NSObject, FlutterPlugin {
         headlessInAppWebView.prepare(params: params as NSDictionary)
         headlessInAppWebView.onWebViewCreated()
         flutterWebView.makeInitialLoad(params: params as NSDictionary)
+    }
+    
+    public func dispose() {
+        HeadlessInAppWebViewManager.channel?.setMethodCallHandler(nil)
+        HeadlessInAppWebViewManager.channel = nil
+        HeadlessInAppWebViewManager.registrar = nil
+        let headlessWebViews = HeadlessInAppWebViewManager.webViews.values
+        headlessWebViews.forEach { (headlessWebView: HeadlessInAppWebView?) in
+            headlessWebView?.dispose()
+        }
+        HeadlessInAppWebViewManager.webViews.removeAll()
     }
 }
