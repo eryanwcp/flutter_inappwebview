@@ -4,14 +4,13 @@
 //
 //  Created by Lorenzo Pichilli on 26/03/21.
 //
-
 import Foundation
 
 public class HeadlessInAppWebView : FlutterMethodCallDelegate {
     var id: String
     var channel: FlutterMethodChannel?
     var flutterWebView: FlutterWebViewController?
-    
+
     public init(id: String, flutterWebView: FlutterWebViewController) {
         self.id = id
         super.init()
@@ -20,10 +19,10 @@ public class HeadlessInAppWebView : FlutterMethodCallDelegate {
                                        binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
         self.channel?.setMethodCallHandler(self.handle)
     }
-    
+
     public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let arguments = call.arguments as? NSDictionary
-        
+
         switch call.method {
         case "dispose":
             dispose()
@@ -44,12 +43,12 @@ public class HeadlessInAppWebView : FlutterMethodCallDelegate {
             break
         }
     }
-    
+
     public func onWebViewCreated() {
         let arguments: [String: Any?] = [:]
         channel?.invokeMethod("onWebViewCreated", arguments: arguments)
     }
-    
+
     public func prepare(params: NSDictionary) {
         if let view = flutterWebView?.view() {
             view.alpha = 0.01
@@ -70,7 +69,7 @@ public class HeadlessInAppWebView : FlutterMethodCallDelegate {
             }
         }
     }
-    
+
     public func setSize(size: Size2D) {
         if let view = flutterWebView?.view() {
             let width = size.width == -1.0 ? UIScreen.main.bounds.width : CGFloat(size.width)
@@ -78,21 +77,21 @@ public class HeadlessInAppWebView : FlutterMethodCallDelegate {
             view.frame = CGRect(x: 0.0, y: 0.0, width: width, height: height)
         }
     }
-    
+
     public func getSize() -> Size2D? {
         if let view = flutterWebView?.view() {
             return Size2D(width: Double(view.frame.width), height: Double(view.frame.height))
         }
         return nil
     }
-    
+
     public func dispose() {
         channel?.setMethodCallHandler(nil)
         channel = nil
         HeadlessInAppWebViewManager.webViews[id] = nil
         flutterWebView = nil
     }
-    
+
     deinit {
         print("HeadlessInAppWebView - dealloc")
         dispose()
