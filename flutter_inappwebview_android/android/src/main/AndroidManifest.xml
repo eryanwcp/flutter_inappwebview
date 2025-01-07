@@ -3,7 +3,7 @@
     package="com.pichillilorenzo.flutter_inappwebview_android">
     <application>
         <activity
-            android:theme="@style/AppTheme"
+            android:theme="@style/ThemeTransparent"
             android:exported="false"
             android:name="com.pichillilorenzo.flutter_inappwebview_android.in_app_browser.InAppBrowserActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density" />
