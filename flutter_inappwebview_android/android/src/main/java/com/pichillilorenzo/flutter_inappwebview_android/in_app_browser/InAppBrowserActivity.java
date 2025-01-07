@@ -227,7 +227,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
         actionBar.setTitle(customSettings.toolbarTopFixedTitle);
 
       hideStatusBar(this);
-      clearImmersiveMode(this);
+//      clearImmersiveMode(this);
     }
   }
 
