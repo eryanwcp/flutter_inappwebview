@@ -9,7 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.view.ViewGroup;
-
+import com.pichillilorenzo.flutter_inappwebview_android.R;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.graphics.Insets;
