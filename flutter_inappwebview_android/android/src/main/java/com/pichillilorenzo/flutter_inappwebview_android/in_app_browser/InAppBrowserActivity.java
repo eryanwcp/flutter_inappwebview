@@ -76,7 +76,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    androidx.activity.EdgeToEdge.enable(this);
+//    androidx.activity.EdgeToEdge.enable(this);
     super.onCreate(savedInstanceState);
 
     Bundle b = getIntent().getExtras();
@@ -226,7 +226,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
       if (customSettings.toolbarTopFixedTitle != null && !customSettings.toolbarTopFixedTitle.isEmpty())
         actionBar.setTitle(customSettings.toolbarTopFixedTitle);
 
-//      hideStatusBar(this);
+      hideStatusBar(this);
     }
   }
 
@@ -234,6 +234,9 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     if (activity == null) return;
     Window window = activity.getWindow();
     if (window == null) return;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      window.setDecorFitsSystemWindows(true);
+    }
     window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
     window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
     WindowManager.LayoutParams lp = window.getAttributes();
