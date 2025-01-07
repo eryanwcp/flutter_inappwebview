@@ -47,7 +47,9 @@ public class CustomBackground extends Drawable {
         if (standardInstance == null) {
             DisplayMetrics m = new DisplayMetrics();
             activity.getWindowManager().getDefaultDisplay().getMetrics(m);
-            standardInstance = new CustomBackground(m.widthPixels, m.heightPixels, activity.getColor(R.color.colorPrimary), insets); // Assuming R.color.colorPrimary is the available and the intended color for the status area
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                standardInstance = new CustomBackground(m.widthPixels, m.heightPixels, activity.getColor(R.color.colorPrimary), insets); // Assuming R.color.colorPrimary is the available and the intended color for the status area
+            }
         } else {
             standardInstance.insets = insets;
         }
