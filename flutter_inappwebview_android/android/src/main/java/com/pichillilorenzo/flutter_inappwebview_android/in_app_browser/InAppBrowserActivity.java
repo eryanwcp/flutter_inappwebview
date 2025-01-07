@@ -9,11 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
+import android.view.*;
 import android.webkit.WebView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -229,7 +225,23 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
       if (customSettings.toolbarTopFixedTitle != null && !customSettings.toolbarTopFixedTitle.isEmpty())
         actionBar.setTitle(customSettings.toolbarTopFixedTitle);
     }
+    hideStatusBar(this);
   }
+
+  public  void hideStatusBar(Activity activity) {
+    if (activity == null) return;
+    Window window = activity.getWindow();
+    if (window == null) return;
+    window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+    WindowManager.LayoutParams lp = window.getAttributes();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+    }
+    window.setAttributes(lp);
+  }
+
+
 
   @SuppressLint("RestrictedApi")
   @Override
