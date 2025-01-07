@@ -19,7 +19,8 @@ import androidx.core.view.WindowInsetsCompat;
 public class CustomBackground extends Drawable {
 
     static public void setDecorBackground(Activity activity) {
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+//        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+        if (android.os.Build.VERSION.SDK_INT >= 35) {
             ViewGroup viewGroup = (ViewGroup) ((ViewGroup) activity
                     .findViewById(android.R.id.content)).getChildAt(0);
             //if required
