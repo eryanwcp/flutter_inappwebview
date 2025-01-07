@@ -76,6 +76,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    androidx.activity.EdgeToEdge.enable(this);
     super.onCreate(savedInstanceState);
 
     Bundle b = getIntent().getExtras();
