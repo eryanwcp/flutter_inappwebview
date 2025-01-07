@@ -217,8 +217,11 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     if (actionBar != null) {
       actionBar.setDisplayShowTitleEnabled(!customSettings.hideTitleBar);
 
-      if (customSettings.hideToolbarTop)
+      if (customSettings.hideToolbarTop){
         actionBar.hide();
+        hideStatusBar(this);
+      }
+
 
       if (customSettings.toolbarTopBackgroundColor != null && !customSettings.toolbarTopBackgroundColor.isEmpty())
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(customSettings.toolbarTopBackgroundColor)));
@@ -226,7 +229,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
       if (customSettings.toolbarTopFixedTitle != null && !customSettings.toolbarTopFixedTitle.isEmpty())
         actionBar.setTitle(customSettings.toolbarTopFixedTitle);
 
-      hideStatusBar(this);
+
 //      clearImmersiveMode(this);
     }
   }
