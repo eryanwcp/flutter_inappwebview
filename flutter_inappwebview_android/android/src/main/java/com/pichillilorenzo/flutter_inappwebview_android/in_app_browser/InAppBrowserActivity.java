@@ -229,8 +229,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
       if (customSettings.toolbarTopFixedTitle != null && !customSettings.toolbarTopFixedTitle.isEmpty())
         actionBar.setTitle(customSettings.toolbarTopFixedTitle);
 
-
-//      clearImmersiveMode(this);
+      supportActionBar(this);
     }
   }
 
@@ -250,18 +249,18 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     window.setAttributes(lp);
   }
 
-  private void clearImmersiveMode(Activity activity) {
+
+  private void supportActionBar(Activity activity) {
     // 恢复状态栏的默认属性
     if (activity == null) return;
     Window window = activity.getWindow();
     if (window == null) return;
-    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-
-    View decorView = window.getDecorView();
-    // 恢复系统UI可见性
-    decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+    com.gyf.immersionbar.ImmersionBar immersionBar = com.gyf.immersionbar.ImmersionBar.with(this);
+    //支持ActionBar使用
+    immersionBar.supportActionBar(true);
+    // 应用沉浸式配置
+    immersionBar.init();
   }
-
 
 
 
