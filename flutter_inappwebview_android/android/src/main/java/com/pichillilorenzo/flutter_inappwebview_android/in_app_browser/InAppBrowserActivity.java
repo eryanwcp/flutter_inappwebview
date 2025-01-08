@@ -219,7 +219,8 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 
       if (customSettings.hideToolbarTop){
         actionBar.hide();
-        hideStatusBar(this);
+//        hideStatusBar(this);
+        supportActionBar(this);
       }
 
 
