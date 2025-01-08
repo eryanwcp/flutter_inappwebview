@@ -85,6 +85,9 @@ class InAppBrowserSettings
   ///- MacOS
   bool? hideToolbarTop;
 
+  /// Android 15+ 适配
+  bool? fixActionBar;
+
   ///Set to `true` to hide the url bar on the toolbar at the top. The default value is `false`.
   ///
   ///**Officially Supported Platforms/Implementations**:
@@ -216,6 +219,7 @@ class InAppBrowserSettings
       this.hideTitleBar = false,
       this.hideToolbarBottom = false,
       this.hideToolbarTop = false,
+      this.fixActionBar = false,
       this.hideUrlBar = false,
       this.menuButtonColor,
       this.presentationStyle = ModalPresentationStyle.FULL_SCREEN,
@@ -295,6 +299,7 @@ class InAppBrowserSettings
     instance.hideTitleBar = map['hideTitleBar'];
     instance.hideToolbarBottom = map['hideToolbarBottom'];
     instance.hideToolbarTop = map['hideToolbarTop'];
+    instance.fixActionBar = map['fixActionBar'];
     instance.hideUrlBar = map['hideUrlBar'];
     instance.presentationStyle = switch (enumMethod ?? EnumMethod.nativeValue) {
       EnumMethod.nativeValue =>
@@ -335,6 +340,7 @@ class InAppBrowserSettings
       "hideTitleBar": hideTitleBar,
       "hideToolbarBottom": hideToolbarBottom,
       "hideToolbarTop": hideToolbarTop,
+      "fixActionBar": fixActionBar,
       "hideUrlBar": hideUrlBar,
       "menuButtonColor": menuButtonColor?.toHex(),
       "presentationStyle": switch (enumMethod ?? EnumMethod.nativeValue) {
@@ -389,6 +395,6 @@ class InAppBrowserSettings
 
   @override
   String toString() {
-    return 'InAppBrowserSettings{allowGoBackWithBackButton: $allowGoBackWithBackButton, closeButtonCaption: $closeButtonCaption, closeButtonColor: $closeButtonColor, closeOnCannotGoBack: $closeOnCannotGoBack, hidden: $hidden, hideCloseButton: $hideCloseButton, hideDefaultMenuItems: $hideDefaultMenuItems, hideProgressBar: $hideProgressBar, hideTitleBar: $hideTitleBar, hideToolbarBottom: $hideToolbarBottom, hideToolbarTop: $hideToolbarTop, hideUrlBar: $hideUrlBar, menuButtonColor: $menuButtonColor, presentationStyle: $presentationStyle, shouldCloseOnBackButtonPressed: $shouldCloseOnBackButtonPressed, toolbarBottomBackgroundColor: $toolbarBottomBackgroundColor, toolbarBottomTintColor: $toolbarBottomTintColor, toolbarBottomTranslucent: $toolbarBottomTranslucent, toolbarTopBackgroundColor: $toolbarTopBackgroundColor, toolbarTopBarTintColor: $toolbarTopBarTintColor, toolbarTopFixedTitle: $toolbarTopFixedTitle, toolbarTopTintColor: $toolbarTopTintColor, toolbarTopTranslucent: $toolbarTopTranslucent, transitionStyle: $transitionStyle, windowAlphaValue: $windowAlphaValue, windowFrame: $windowFrame, windowStyleMask: $windowStyleMask, windowTitlebarSeparatorStyle: $windowTitlebarSeparatorStyle, windowType: $windowType}';
+    return 'InAppBrowserSettings{allowGoBackWithBackButton: $allowGoBackWithBackButton, closeButtonCaption: $closeButtonCaption, closeButtonColor: $closeButtonColor, closeOnCannotGoBack: $closeOnCannotGoBack, hidden: $hidden, hideCloseButton: $hideCloseButton, hideDefaultMenuItems: $hideDefaultMenuItems, hideProgressBar: $hideProgressBar, hideTitleBar: $hideTitleBar, hideToolbarBottom: $hideToolbarBottom, hideToolbarTop: $hideToolbarTop,fixActionBar: $fixActionBar, hideUrlBar: $hideUrlBar, menuButtonColor: $menuButtonColor, presentationStyle: $presentationStyle, shouldCloseOnBackButtonPressed: $shouldCloseOnBackButtonPressed, toolbarBottomBackgroundColor: $toolbarBottomBackgroundColor, toolbarBottomTintColor: $toolbarBottomTintColor, toolbarBottomTranslucent: $toolbarBottomTranslucent, toolbarTopBackgroundColor: $toolbarTopBackgroundColor, toolbarTopBarTintColor: $toolbarTopBarTintColor, toolbarTopFixedTitle: $toolbarTopFixedTitle, toolbarTopTintColor: $toolbarTopTintColor, toolbarTopTranslucent: $toolbarTopTranslucent, transitionStyle: $transitionStyle, windowAlphaValue: $windowAlphaValue, windowFrame: $windowFrame, windowStyleMask: $windowStyleMask, windowTitlebarSeparatorStyle: $windowTitlebarSeparatorStyle, windowType: $windowType}';
   }
 }

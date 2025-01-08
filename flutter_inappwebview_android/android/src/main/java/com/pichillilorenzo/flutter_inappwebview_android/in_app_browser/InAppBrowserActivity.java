@@ -222,14 +222,16 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 //        hideStatusBar(this);
       }
 
+      if(customSettings.fixActionBar){
+        fixActionBar(this,true);
+      }
+
 
       if (customSettings.toolbarTopBackgroundColor != null && !customSettings.toolbarTopBackgroundColor.isEmpty())
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(customSettings.toolbarTopBackgroundColor)));
 
       if (customSettings.toolbarTopFixedTitle != null && !customSettings.toolbarTopFixedTitle.isEmpty())
         actionBar.setTitle(customSettings.toolbarTopFixedTitle);
-
-      supportActionBar(this);
     }
   }
 
@@ -250,14 +252,14 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
   }
 
 
-  private void supportActionBar(Activity activity) {
+  private void fixActionBar(Activity activity,boolean supportActionBar) {
     // 恢复状态栏的默认属性
     if (activity == null) return;
     Window window = activity.getWindow();
     if (window == null) return;
     com.gyf.immersionbar.ImmersionBar immersionBar = com.gyf.immersionbar.ImmersionBar.with(this);
     //支持ActionBar使用
-    immersionBar.supportActionBar(true);
+    immersionBar.supportActionBar(supportActionBar);
     // 应用沉浸式配置
     immersionBar.init();
   }
@@ -531,6 +533,10 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
         actionBar.hide();
       else
         actionBar.show();
+    }
+
+    if (actionBar != null && newSettingsMap.get("fixActionBar") != null && customSettings.fixActionBar != newSettings.fixActionBar) {
+      fixActionBar(this,newSettings.fixActionBar);
     }
 
     if (actionBar != null && newSettingsMap.get("toolbarTopBackgroundColor") != null &&
