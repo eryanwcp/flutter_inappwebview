@@ -536,7 +536,10 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     }
 
     if (actionBar != null && newSettingsMap.get("fixActionBar") != null && customSettings.fixActionBar != newSettings.fixActionBar) {
-      fixActionBar(this,newSettings.fixActionBar);
+      if (newSettings.fixActionBar)
+
+      else
+        actionBar.show();
     }
 
     if (actionBar != null && newSettingsMap.get("toolbarTopBackgroundColor") != null &&

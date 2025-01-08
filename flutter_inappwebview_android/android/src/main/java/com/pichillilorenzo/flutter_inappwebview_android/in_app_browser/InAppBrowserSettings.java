@@ -15,6 +15,7 @@ public class InAppBrowserSettings implements ISettings<InAppBrowserActivity> {
 
   public Boolean hidden = false;
   public Boolean hideToolbarTop = false;
+  public Boolean fixActionBar = false;
   @Nullable
   public String toolbarTopBackgroundColor;
   @Nullable
@@ -44,6 +45,9 @@ public class InAppBrowserSettings implements ISettings<InAppBrowserActivity> {
           break;
         case "hideToolbarTop":
           hideToolbarTop = (Boolean) value;
+          break;
+        case "fixActionBar":
+          fixActionBar = (Boolean) value;
           break;
         case "toolbarTopBackgroundColor":
           toolbarTopBackgroundColor = (String) value;
@@ -84,6 +88,7 @@ public class InAppBrowserSettings implements ISettings<InAppBrowserActivity> {
     Map<String, Object> settings = new HashMap<>();
     settings.put("hidden", hidden);
     settings.put("hideToolbarTop", hideToolbarTop);
+    settings.put("fixActionBar", fixActionBar);
     settings.put("toolbarTopBackgroundColor", toolbarTopBackgroundColor);
     settings.put("toolbarTopFixedTitle", toolbarTopFixedTitle);
     settings.put("hideUrlBar", hideUrlBar);
@@ -102,6 +107,7 @@ public class InAppBrowserSettings implements ISettings<InAppBrowserActivity> {
     Map<String, Object> realSettings = toMap();
     realSettings.put("hidden", inAppBrowserActivity.isHidden);
     realSettings.put("hideToolbarTop", inAppBrowserActivity.actionBar == null || !inAppBrowserActivity.actionBar.isShowing());
+    realSettings.put("fixActionBar", inAppBrowserActivity.actionBar != null && inAppBrowserActivity.actionBar.isShowing() && realSettings.get("fixActionBar"));
     realSettings.put("hideUrlBar", inAppBrowserActivity.menu == null || !inAppBrowserActivity.menu.findItem(R.id.menu_search).isVisible());
     realSettings.put("hideProgressBar", inAppBrowserActivity.progressBar == null || inAppBrowserActivity.progressBar.getMax() == 0);
     return realSettings;
