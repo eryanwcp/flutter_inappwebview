@@ -107,7 +107,6 @@ public class InAppBrowserSettings implements ISettings<InAppBrowserActivity> {
     Map<String, Object> realSettings = toMap();
     realSettings.put("hidden", inAppBrowserActivity.isHidden);
     realSettings.put("hideToolbarTop", inAppBrowserActivity.actionBar == null || !inAppBrowserActivity.actionBar.isShowing());
-    realSettings.put("fixActionBar", inAppBrowserActivity.actionBar != null && inAppBrowserActivity.actionBar.isShowing() && realSettings.get("fixActionBar"));
     realSettings.put("hideUrlBar", inAppBrowserActivity.menu == null || !inAppBrowserActivity.menu.findItem(R.id.menu_search).isVisible());
     realSettings.put("hideProgressBar", inAppBrowserActivity.progressBar == null || inAppBrowserActivity.progressBar.getMax() == 0);
     return realSettings;
