@@ -361,10 +361,10 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
       if (actionGoForward != null) {
         actionGoForward.setVisible(false);
       }
-      MenuItem actionShare = menu.findItem(R.id.action_share);
-      if (actionShare != null) {
-        actionShare.setVisible(false);
-      }
+//      MenuItem actionShare = menu.findItem(R.id.action_share);
+//      if (actionShare != null) {
+//        actionShare.setVisible(false);
+//      }
     }
 
     for (final InAppBrowserMenuItem menuItem : menuItems) {
@@ -567,10 +567,10 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
       if (actionGoForward != null) {
         actionGoForward.setVisible(!newSettings.hideDefaultMenuItems);
       }
-      MenuItem actionShare = menu.findItem(R.id.action_share);
-      if (actionShare != null) {
-        actionShare.setVisible(!newSettings.hideDefaultMenuItems);
-      }
+//      MenuItem actionShare = menu.findItem(R.id.action_share);
+//      if (actionShare != null) {
+//        actionShare.setVisible(!newSettings.hideDefaultMenuItems);
+//      }
     }
 
     customSettings = newSettings;
